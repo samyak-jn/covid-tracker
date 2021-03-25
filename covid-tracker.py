@@ -15,6 +15,10 @@ try:
 except ImportError:
     install("requests")
 
+#importing the packages
+from bs4 import BeautifulSoup
+import requests
+
 print("      --- Welcome to Covid-Tracker ---")
 print("\n--------------------------------------------")
 
@@ -41,17 +45,18 @@ if response.status_code==200:
 c_response=requests.get(site)
 c_data = {}
 if c_response.status_code==200:
-    data=BeautifulSoup(response.text,'html.parser')
+    data=BeautifulSoup(c_response.text,'html.parser')
     info = data.find_all("div", {"id": "maincounter-wrap"})
     for div in info:
         key = div.text.split(":")[0].strip('\n')
-        value = div.text.split(":")[1].strip('\n').strip()
-        c_data[key] = value
-    print("\n--------------------------------------------")
-    print(f"Current status of {check_country}:")
+        if(key!="Projections"):
+            value = div.text.split(":")[1].strip('\n').strip()
+            c_data[key] = value
+    print("--------------------------------------------")
+    print(f"Current status of {check_country}:\n")
     for info_text in c_data:
         print(f"{info_text}: {c_data[info_text]}")
-
+    print(f"Active Case: {format(int(c_data['Coronavirus Cases'].replace(',', ''))-int(c_data['Recovered'].replace(',', ''))-int(c_data['Deaths'].replace(',', '')), ',')}")
 print("--------------------------------------------")
-print("\nThank you for using covid-meter, Stay Inside, Stay Safe!")
+print("Thank you for using covid-meter, Stay Inside, Stay Safe!")
 
